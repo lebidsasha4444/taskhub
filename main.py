@@ -1,6 +1,7 @@
-import os
+from taskhub import create_app
 
-from flask import Flask
+app = create_app()
 
-app = Flask(__name__)
-app.run(debug=os.getenv("DEBUG"))
+
+if __name__ == "__main__":
+    app.run()
