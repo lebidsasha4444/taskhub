@@ -20,6 +20,29 @@ python main.py
 
 The health check is available at `GET /health`.
 
+## Users and notes
+
+Create a user, then create and read that user's notes (stored as `Task` records):
+
+```http
+POST /users
+Content-Type: application/json
+
+{"username": "alice"}
+```
+
+Use the returned user ID to create a note:
+
+```http
+POST /users/1/tasks
+Content-Type: application/json
+
+{"title": "Shopping", "content": "Buy apples"}
+```
+
+Read all notes for that user with `GET /users/1/tasks`, or one note with
+`GET /tasks/<task_id>`.
+
 ## Architecture
 
 - `taskhub/__init__.py` creates the Flask app and connects extensions.
