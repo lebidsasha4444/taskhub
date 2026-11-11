@@ -14,11 +14,19 @@ Copy-Item .env.example .env
 Run the app with Flask's CLI (which loads `.env`) or directly:
 
 ```powershell
+flask --app taskhub db upgrade
 flask --app taskhub run
 python main.py
 ```
 
-The health check is available at `GET /health`.
+The status page is available at `GET /health`.
+
+## Users and notes
+
+Open `/users` to create users and browse their notes (stored as `Task` records).
+Use the forms on each page to create a user or add a note. Select a user to view
+their notes, or select a note to view its content. Routes render HTML templates;
+they do not provide JSON API responses.
 
 ## Architecture
 
@@ -34,15 +42,16 @@ use another SQLAlchemy-supported database URI. `DEBUG` is parsed as a boolean.
 
 ## Database migrations
 
-Initialize the migration repository once, then create and apply migrations as
-models are added:
+The initial schema migration is included. Apply it before the first run with
+`flask --app taskhub db upgrade`. When models change, generate and apply a
+migration:
 
 ```powershell
-flask --app taskhub db init
 flask --app taskhub db migrate -m "Describe schema change"
 flask --app taskhub db upgrade
 ```
 
+Run `flask --app taskhub db init` only when creating a new migration repository.
 Import model modules from `taskhub/models.py` so Flask-Migrate can find their
 metadata. Do not use `db.create_all()` as a replacement for migrations.
 
