@@ -26,7 +26,8 @@ class AppFactoryTests(unittest.TestCase):
         response = self.client.get("/health")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"status": "ok"})
+        self.assertFalse(response.is_json)
+        self.assertIn(b"Taskhub is running", response.data)
 
     def test_database_connection(self) -> None:
         with self.app.app_context():
@@ -35,44 +36,53 @@ class AppFactoryTests(unittest.TestCase):
         self.assertEqual(result, 1)
 
     def test_create_and_read_tasks_for_user(self) -> None:
-        user_response = self.client.post("/users", json={"username": "alice"})
+        user_response = self.client.post("/users", data={"username": "alice"})
 
-        self.assertEqual(user_response.status_code, 201)
-        user_id = user_response.json["id"]
+        self.assertEqual(user_response.status_code, 200)
+        self.assertIn(b"alice", user_response.data)
 
         create_response = self.client.post(
-            f"/users/{user_id}/tasks",
-            json={"title": "Shopping", "content": "Buy apples"},
+            "/users/1/tasks",
+            data={"title": "Shopping", "content": "Buy apples"},
         )
 
-        self.assertEqual(create_response.status_code, 201)
-        task = create_response.json
-        self.assertEqual(task["title"], "Shopping")
-        self.assertEqual(task["content"], "Buy apples")
-        self.assertEqual(task["user_id"], user_id)
-        self.assertIn("created_at", task)
+        self.assertEqual(create_response.status_code, 200)
+        self.assertIn(b"Shopping", create_response.data)
 
-        list_response = self.client.get(f"/users/{user_id}/tasks")
+        list_response = self.client.get("/users/1/tasks")
         self.assertEqual(list_response.status_code, 200)
-        self.assertEqual(list_response.json, [task])
+        self.assertFalse(list_response.is_json)
+        self.assertIn(b"Shopping", list_response.data)
 
-        read_response = self.client.get(f"/tasks/{task['id']}")
+        read_response = self.client.get("/tasks/1")
         self.assertEqual(read_response.status_code, 200)
-        self.assertEqual(read_response.json, task)
+        self.assertFalse(read_response.is_json)
+        self.assertIn(b"Buy apples", read_response.data)
+
+    def test_pages_render_html_even_when_json_is_requested(self) -> None:
+        users_page = self.client.get(
+            "/users",
+            headers={"Accept": "application/json"},
+        )
+        self.assertEqual(users_page.status_code, 200)
+        self.assertFalse(users_page.is_json)
+        self.assertIn(b"<h1>Users</h1>", users_page.data)
 
     def test_create_task_rejects_missing_user_or_content(self) -> None:
         missing_user = self.client.post(
             "/users/999/tasks",
-            json={"title": "Shopping", "content": "Buy apples"},
+            data={"title": "Shopping", "content": "Buy apples"},
         )
         self.assertEqual(missing_user.status_code, 404)
+        self.assertFalse(missing_user.is_json)
 
-        user_response = self.client.post("/users", json={"username": "alice"})
+        self.client.post("/users", data={"username": "alice"})
         invalid_task = self.client.post(
-            f"/users/{user_response.json['id']}/tasks",
-            json={"title": "Shopping", "content": " "},
+            "/users/1/tasks",
+            data={"title": "Shopping", "content": " "},
         )
         self.assertEqual(invalid_task.status_code, 400)
+        self.assertFalse(invalid_task.is_json)
 
 
 if __name__ == "__main__":

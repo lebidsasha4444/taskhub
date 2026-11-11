@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Taskhub{% endblock %}</title>
+    <style>
+      body { color: #202124; font: 16px/1.5 system-ui, sans-serif; margin: 0 auto; max-width: 760px; padding: 2rem 1rem; }
+      h1, h2 { line-height: 1.2; }
+      a { color: #0759a5; }
+      form { display: grid; gap: .75rem; margin: 1.5rem 0; max-width: 32rem; }
+      input, textarea, button { font: inherit; padding: .55rem; }
+      textarea { min-height: 7rem; }
+      button { cursor: pointer; justify-self: start; }
+      li { margin: .75rem 0; }
+      .muted { color: #5f6368; }
+    </style>
+  </head>
+  <body>
+    <header><a href="{{ url_for('main.list_users') }}">Taskhub</a></header>
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>

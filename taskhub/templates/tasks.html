@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} · Taskhub{% endblock %}
+{% block content %}
+  <h1>{{ user.username }}'s tasks</h1>
+  <form method="post" action="{{ url_for('main.create_task', user_id=user.id) }}">
+    <label for="title">Title</label>
+    <input id="title" name="title" maxlength="200" required>
+    <label for="content">Content</label>
+    <textarea id="content" name="content" required></textarea>
+    <button type="submit">Create task</button>
+  </form>
+
+  <h2>Tasks</h2>
+  {% if tasks %}
+    <ul>
+      {% for task in tasks %}
+        <li><a href="{{ url_for('main.get_task', task_id=task.id) }}">{{ task.title }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">No tasks yet.</p>
+  {% endif %}
+{% endblock %}
