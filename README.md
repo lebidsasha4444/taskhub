@@ -21,12 +21,16 @@ python main.py
 
 The status page is available at `GET /health`.
 
-## Users and notes
+## Accounts and notes
 
-Open `/users` to create users and browse their notes (stored as `Task` records).
-Use the forms on each page to create a user or add a note. Select a user to view
-their notes, or select a note to view its content. Routes render HTML templates;
-they do not provide JSON API responses.
+Open `/register` to create an account with a username, email address, and
+password, or sign in at `/login`. Passwords are stored as hashes. Successful
+registration and sign-in open the overview dashboard. Use the left navigation
+to view the dashboard or your tasks, create tasks with a deadline and low,
+middle, or high priority, and sign out. Selecting a task opens its full details.
+Routes render HTML templates; they do not provide JSON API responses. Set
+`SECRET_KEY` to a stable, private value in `.env` for sessions to remain valid
+across application restarts.
 
 ## Architecture
 
