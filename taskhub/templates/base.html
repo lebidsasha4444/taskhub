@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Taskhub{% endblock %}</title>
+    <style>
+      :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17243b; background: #f5f7fb; font-synthesis: none; }
+      * { box-sizing: border-box; }
+      body { min-width: 320px; min-height: 100vh; margin: 0; }
+      a { color: inherit; }
+      button, input, textarea, select { font: inherit; }
+      button { cursor: pointer; }
+      .app-shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100vh; }
+      .sidebar { position: sticky; top: 0; display: flex; height: 100vh; flex-direction: column; padding: 1.6rem 1.1rem 1.15rem; color: #fff; background: linear-gradient(165deg, #123f93, #102d68 75%); }
+      .brand { display: flex; align-items: center; gap: .7rem; padding: .35rem .7rem 2.4rem; color: #fff; font-size: 1.1rem; font-weight: 750; letter-spacing: -.03em; text-decoration: none; }
+      .brand-mark { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border: 1px solid rgb(255 255 255 / 27%); border-radius: .7rem; background: rgb(255 255 255 / 12%); }
+      .nav-label { padding: 0 .8rem; margin: 0 0 .6rem; color: #a9bfeb; font-size: .68rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+      .side-nav { display: grid; gap: .35rem; }
+      .nav-link { display: flex; align-items: center; gap: .8rem; padding: .75rem .8rem; border-radius: .65rem; color: #d7e4ff; font-size: .91rem; font-weight: 580; text-decoration: none; transition: background .15s, color .15s; }
+      .nav-link:hover, .nav-link.active { color: #fff; background: rgb(255 255 255 / 13%); }
+      .nav-icon { display: grid; width: 1.35rem; place-items: center; color: #b8cffb; font-size: 1.05rem; }
+      .sidebar-spacer { flex: 1; }
+      .sidebar-divider { height: 1px; margin: 1.1rem .5rem; background: rgb(255 255 255 / 14%); }
+      .profile-card { display: flex; align-items: center; gap: .7rem; padding: .7rem; border: 1px solid rgb(255 255 255 / 12%); border-radius: .8rem; background: rgb(255 255 255 / 7%); }
+      .avatar { display: grid; width: 2.3rem; height: 2.3rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #dce8ff; color: #164ba8; font-size: .9rem; font-weight: 750; }
+      .profile-name { overflow: hidden; color: #fff; font-size: .84rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+      .profile-caption { margin-top: .12rem; color: #afc4ea; font-size: .72rem; }
+      .main-area { min-width: 0; padding: clamp(1.5rem, 4vw, 3.5rem); }
+      .content-wrap { width: min(100%, 1050px); margin: 0 auto; }
+      .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+      .eyebrow { margin: 0 0 .55rem; color: #6d7f9b; font-size: .73rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+      h1, h2, h3 { line-height: 1.2; }
+      h1 { margin: 0; color: #17243b; font-size: clamp(1.9rem, 3.5vw, 2.6rem); letter-spacing: -.055em; }
+      h2 { margin: 0; color: #1b2b47; font-size: 1.15rem; letter-spacing: -.025em; }
+      .page-subtitle { margin: .65rem 0 0; color: #728099; }
+      .primary-button { display: inline-flex; min-height: 2.85rem; align-items: center; justify-content: center; gap: .55rem; padding: .7rem 1rem; border: 0; border-radius: .65rem; background: #1b60dc; color: #fff; font-size: .9rem; font-weight: 700; text-decoration: none; box-shadow: 0 6px 14px rgb(27 96 220 / 16%); transition: transform .15s, background .15s; }
+      .primary-button:hover { transform: translateY(-1px); background: #124fc0; }
+      .secondary-button { display: inline-flex; min-height: 2.7rem; align-items: center; justify-content: center; padding: .65rem .95rem; border: 1px solid #dfe6f0; border-radius: .65rem; background: #fff; color: #294469; font-size: .88rem; font-weight: 650; text-decoration: none; }
+      .panel { border: 1px solid #e8edf5; border-radius: 1rem; background: #fff; box-shadow: 0 8px 26px rgb(24 47 83 / 4%); }
+      .muted { color: #7a879b; }
+      .logout-form { margin: .4rem 0 0; }
+      .logout-button { width: 100%; justify-content: flex-start; border: 0; background: transparent; box-shadow: none; }
+      .logout-button:hover { transform: none; background: rgb(255 255 255 / 11%); }
+      .task-list { display: grid; gap: .75rem; }
+      .task-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.25rem; border: 1px solid #e8edf5; border-radius: .85rem; background: #fff; color: inherit; text-decoration: none; transition: border-color .15s, transform .15s, box-shadow .15s; }
+      .task-card:hover { transform: translateY(-1px); border-color: #b9ccef; box-shadow: 0 8px 22px rgb(24 47 83 / 7%); }
+      .task-title { overflow: hidden; margin: 0; color: #1c2a42; font-size: .98rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+      .task-deadline { margin: .35rem 0 0; color: #78869c; font-size: .82rem; }
+      .priority { display: inline-flex; flex: 0 0 auto; align-items: center; gap: .4rem; padding: .35rem .62rem; border-radius: 99px; font-size: .75rem; font-weight: 750; text-transform: capitalize; }
+      .priority::before { width: .42rem; height: .42rem; border-radius: 50%; background: currentColor; content: ""; }
+      .priority-high { background: #fff0ef; color: #c83d36; }
+      .priority-middle { background: #fff8df; color: #997100; }
+      .priority-low { background: #eaf8ef; color: #27854e; }
+      .empty-state { padding: 3rem 1.5rem; text-align: center; }
+      .empty-mark { display: grid; width: 3.5rem; height: 3.5rem; place-items: center; margin: 0 auto 1rem; border-radius: 1rem; background: #edf3ff; color: #2862c7; font-size: 1.5rem; }
+      .empty-state p { margin: .55rem auto 1.2rem; color: #7a879b; }
+      .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+      .stat-card { padding: 1.25rem; }
+      .stat-label { margin: 0; color: #728099; font-size: .84rem; font-weight: 600; }
+      .stat-value { margin: .5rem 0 0; color: #182942; font-size: 2rem; font-weight: 760; letter-spacing: -.06em; }
+      .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+      .detail-panel { padding: clamp(1.25rem, 3vw, 2rem); }
+      .detail-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin: 1rem 0 1.5rem; }
+      .detail-content { padding-top: 1.4rem; border-top: 1px solid #edf0f5; color: #34445e; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+      .message { padding: .8rem .95rem; margin: 0 0 1rem; border: 1px solid #f3c7c7; border-radius: .65rem; background: #fff4f4; color: #9c2525; font-size: .9rem; }
+      dialog { width: min(100% - 2rem, 560px); max-height: min(90vh, 760px); padding: 0; overflow: auto; border: 1px solid #e4eaf3; border-radius: 1rem; background: #fff; color: #17243b; box-shadow: 0 25px 80px rgb(13 31 64 / 27%); }
+      dialog::backdrop { background: rgb(12 27 52 / 54%); backdrop-filter: blur(3px); }
+      .dialog-inner { padding: 1.5rem; }
+      .dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
+      .dialog-heading p { margin: .4rem 0 0; color: #78869c; font-size: .88rem; }
+      .close-button { display: grid; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; place-items: center; border: 1px solid #e4eaf3; border-radius: .6rem; background: #fff; color: #65748c; font-size: 1.1rem; }
+      .task-form { display: grid; gap: 1rem; }
+      .field { display: grid; gap: .45rem; }
+      .field label { color: #33435c; font-size: .85rem; font-weight: 680; }
+      .field input, .field textarea, .field select { width: 100%; min-height: 2.9rem; padding: .7rem .8rem; border: 1px solid #dce3ee; border-radius: .6rem; outline: none; background: #fff; color: #17243b; }
+      .field textarea { min-height: 7.5rem; resize: vertical; }
+      .field input:focus, .field textarea:focus, .field select:focus { border-color: #3478ed; box-shadow: 0 0 0 3px rgb(52 120 237 / 13%); }
+      .dialog-actions { display: flex; justify-content: flex-end; gap: .65rem; padding-top: .3rem; }
+      @media (max-width: 760px) {
+        .app-shell { grid-template-columns: 1fr; }
+        .sidebar { position: static; height: auto; padding: .7rem 1rem; }
+        .brand { padding: .3rem .3rem .65rem; }
+        .nav-label, .sidebar-divider, .profile-card, .sidebar-spacer { display: none; }
+        .side-nav { display: flex; align-items: center; gap: .3rem; overflow-x: auto; }
+        .nav-link { flex: 0 0 auto; padding: .6rem .7rem; }
+        .logout-form { margin: 0 0 0 auto; }
+        .logout-button { width: auto; padding: .6rem .7rem; }
+        .main-area { padding: 1.6rem 1rem 2.5rem; }
+      }
+      @media (max-width: 540px) {
+        .page-header { flex-direction: column; align-items: stretch; }
+        .page-header .primary-button { align-self: flex-start; }
+        .stats-grid { grid-template-columns: 1fr; gap: .7rem; }
+        .stat-card { padding: 1rem 1.1rem; }
+        .stat-value { font-size: 1.7rem; }
+        .task-card { align-items: flex-start; padding: 1rem; }
+        .task-card .priority { font-size: .7rem; }
+      }
+    </style>
+  </head>
+  <body>
+    {% if session.get("user_id") %}
+      <div class="app-shell">
+        <aside class="sidebar">
+          <a class="brand" href="{{ url_for('main.overview', user_id=session['user_id']) }}">
+            <span class="brand-mark" aria-hidden="true">T</span>Taskhub
+          </a>
+          <p class="nav-label">Workspace</p>
+          <nav class="side-nav" aria-label="Main navigation">
+            <a class="nav-link{% if request.endpoint == 'main.overview' %} active{% endif %}" href="{{ url_for('main.overview', user_id=session['user_id']) }}" {% if request.endpoint == 'main.overview' %}aria-current="page"{% endif %}>
+              <span class="nav-icon" aria-hidden="true">⌂</span>Overview
+            </a>
+            <a class="nav-link{% if request.endpoint in ['main.list_tasks', 'main.get_task'] %} active{% endif %}" href="{{ url_for('main.list_tasks', user_id=session['user_id']) }}" {% if request.endpoint in ['main.list_tasks', 'main.get_task'] %}aria-current="page"{% endif %}>
+              <span class="nav-icon" aria-hidden="true">▤</span>My tasks
+            </a>
+          </nav>
+          <div class="sidebar-spacer"></div>
+          <form class="logout-form" method="post" action="{{ url_for('main.logout') }}">
+            <button class="nav-link logout-button" type="submit"><span class="nav-icon" aria-hidden="true">↪</span>Log out</button>
+          </form>
+          <div class="sidebar-divider"></div>
+          <div class="profile-card" aria-label="Signed in as {{ current_user.username if current_user else 'user' }}">
+            <span class="avatar" aria-hidden="true">{{ current_user.username[0]|upper if current_user else "U" }}</span>
+            <div style="min-width: 0">
+              <div class="profile-name">{{ current_user.username if current_user else "Your profile" }}</div>
+              <div class="profile-caption">Your account</div>
+            </div>
+          </div>
+        </aside>
+        <main class="main-area"><div class="content-wrap">
+    {% else %}
+      <main class="content-wrap" style="padding: 2rem 1rem">
+    {% endif %}
+    {% block content %}{% endblock %}
+    {% if session.get("user_id") %}
+        </div></main>
+      </div>
+    {% else %}
+      </main>
+    {% endif %}
+  </body>
+</html>

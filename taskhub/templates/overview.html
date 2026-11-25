@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Overview · Taskhub{% endblock %}
+{% block content %}
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Your workspace</p>
+      <h1>Good to see you, {{ user.username }}.</h1>
+      <p class="page-subtitle">A clear view of what you have on your plate.</p>
+    </div>
+    <a class="primary-button" href="{{ url_for('main.list_tasks', user_id=user.id) }}">＋ <span>Create new task</span></a>
+  </header>
+
+  <section class="stats-grid" aria-label="Task summary">
+    <article class="panel stat-card">
+      <p class="stat-label">All your tasks</p>
+      <p class="stat-value">{{ task_count }}</p>
+    </article>
+    <article class="panel stat-card">
+      <p class="stat-label">High priority</p>
+      <p class="stat-value">{{ high_priority_count }}</p>
+    </article>
+    <article class="panel stat-card">
+      <p class="stat-label">Due in the next 7 days</p>
+      <p class="stat-value">{{ upcoming_count }}</p>
+    </article>
+  </section>
+
+  <section aria-labelledby="recent-heading">
+    <div class="section-heading">
+      <h2 id="recent-heading">Recently added</h2>
+      <a class="secondary-button" href="{{ url_for('main.list_tasks', user_id=user.id) }}">View all tasks</a>
+    </div>
+    {% if recent_tasks %}
+      <div class="task-list">
+        {% for task in recent_tasks %}
+          <a class="task-card" href="{{ url_for('main.get_task', task_id=task.id) }}">
+            <div style="min-width: 0">
+              <p class="task-title">{{ task.title }}</p>
+              <p class="task-deadline">{% if task.due_date %}Due {{ task.due_date.strftime("%b %d, %Y") }}{% else %}No deadline{% endif %}</p>
+            </div>
+            <span class="priority priority-{{ task.priority }}">{{ task.priority }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="panel empty-state">
+        <div class="empty-mark" aria-hidden="true">✓</div>
+        <h2>Nothing on your list yet</h2>
+        <p>Create a task to give your next idea a place to land.</p>
+        <a class="primary-button" href="{{ url_for('main.list_tasks', user_id=user.id) }}">Create your first task</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

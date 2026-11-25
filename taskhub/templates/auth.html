@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if mode == "register" %}Create account{% else %}Sign in{% endif %} · Taskhub</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #17243b;
+        background: #fff;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; }
+      .auth-layout { display: grid; grid-template-columns: minmax(320px, .92fr) 1.08fr; min-height: 100vh; }
+      .intro {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: clamp(2rem, 5vw, 5rem);
+        color: #fff;
+        background: linear-gradient(145deg, #145ee8 0%, #1248bd 55%, #103c9e 100%);
+      }
+      .intro::after {
+        position: absolute;
+        right: -9rem;
+        bottom: -11rem;
+        width: 30rem;
+        height: 30rem;
+        border: 1px solid rgb(255 255 255 / 15%);
+        border-radius: 50%;
+        box-shadow: 0 0 0 3rem rgb(255 255 255 / 4%), 0 0 0 6rem rgb(255 255 255 / 3%);
+        content: "";
+      }
+      .brand { display: inline-flex; align-items: center; gap: .75rem; font-size: 1.2rem; font-weight: 750; letter-spacing: -.03em; }
+      .brand-mark { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border: 1px solid rgb(255 255 255 / 35%); border-radius: .8rem; background: rgb(255 255 255 / 12%); }
+      .intro-copy { position: relative; z-index: 1; max-width: 34rem; padding: 3rem 0; }
+      .eyebrow { margin: 0 0 1.15rem; color: #c9dbff; font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+      .intro h1 { max-width: 10ch; margin: 0; font-size: clamp(2.8rem, 5.2vw, 5rem); font-weight: 720; letter-spacing: -.065em; line-height: 1.02; }
+      .intro-copy > p:last-child { max-width: 27rem; margin: 1.5rem 0 0; color: #dce8ff; font-size: 1.05rem; line-height: 1.75; }
+      .intro-footer { color: #c9dbff; font-size: .84rem; }
+      .form-side { display: grid; place-items: center; padding: 2rem; }
+      .auth-card { width: min(100%, 27rem); }
+      .mobile-brand { display: none; }
+      .form-heading { margin-bottom: 2rem; }
+      .form-heading h2 { margin: 0; color: #14233b; font-size: 2rem; letter-spacing: -.045em; }
+      .form-heading p { margin: .55rem 0 0; color: #6a7890; }
+      .switcher { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem; padding: .3rem; margin-bottom: 1.7rem; border: 1px solid #e6ebf3; border-radius: .8rem; background: #f5f7fb; }
+      .switcher a { padding: .7rem; border-radius: .55rem; color: #6c7890; font-size: .91rem; font-weight: 650; text-align: center; text-decoration: none; }
+      .switcher a.active { color: #1556cc; background: #fff; box-shadow: 0 1px 4px rgb(22 46 86 / 12%); }
+      .auth-form { display: grid; gap: 1rem; }
+      .field { display: grid; gap: .45rem; }
+      .field label { color: #293851; font-size: .87rem; font-weight: 650; }
+      .field input { width: 100%; min-height: 3.1rem; padding: .75rem .9rem; border: 1px solid #dce3ee; border-radius: .65rem; outline: none; background: #fff; color: #17243b; font: inherit; transition: border-color .15s, box-shadow .15s; }
+      .field input::placeholder { color: #98a4b7; }
+      .field input:focus { border-color: #3478ed; box-shadow: 0 0 0 3px rgb(52 120 237 / 13%); }
+      .submit-button { min-height: 3.15rem; margin-top: .5rem; border: 0; border-radius: .65rem; background: #1b60dc; color: #fff; cursor: pointer; font: inherit; font-weight: 700; box-shadow: 0 7px 16px rgb(27 96 220 / 20%); transition: background .15s, transform .15s; }
+      .submit-button:hover { transform: translateY(-1px); background: #124fc0; }
+      .message { padding: .8rem .9rem; margin: 0 0 1rem; border-radius: .6rem; font-size: .9rem; }
+      .message.error { border: 1px solid #f3c7c7; background: #fff4f4; color: #9c2525; }
+      .message.success { border: 1px solid #bfe7d2; background: #f0fbf5; color: #176b3e; }
+      .form-note { margin: 1.2rem 0 0; color: #8290a4; font-size: .82rem; text-align: center; }
+      @media (max-width: 760px) {
+        .auth-layout { grid-template-columns: 1fr; }
+        .intro { min-height: 17rem; padding: 1.5rem 1.75rem; }
+        .intro-copy { padding: 2rem 0 1.5rem; }
+        .intro h1 { max-width: 14ch; font-size: clamp(2.3rem, 10vw, 3.4rem); }
+        .intro-copy > p:last-child { margin-top: .8rem; font-size: .95rem; }
+        .intro-footer { display: none; }
+        .form-side { padding: 2.5rem 1.5rem; }
+      }
+      @media (max-width: 420px) {
+        .intro { min-height: 15rem; }
+        .intro h1 { font-size: 2.25rem; }
+        .form-side { padding: 2rem 1.25rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="auth-layout">
+      <section class="intro" aria-label="About Taskhub">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">T</span>Taskhub</div>
+        <div class="intro-copy">
+          <p class="eyebrow">A little more focus. A lot more done.</p>
+          <h1>Make room for what matters.</h1>
+          <p>Keep your tasks and notes in one calm, clear place. Plan your next step, capture a good idea, and make progress that sticks.</p>
+        </div>
+        <div class="intro-footer">Your day, organized around you.</div>
+      </section>
+
+      <section class="form-side" aria-label="{% if mode == 'register' %}Create account{% else %}Sign in{% endif %}">
+        <div class="auth-card">
+          <div class="mobile-brand brand"><span class="brand-mark" aria-hidden="true">T</span>Taskhub</div>
+          <div class="form-heading">
+            <h2>{% if mode == "register" %}Create your account{% else %}Welcome back{% endif %}</h2>
+            <p>{% if mode == "register" %}Start organizing what matters to you.{% else %}Sign in to pick up where you left off.{% endif %}</p>
+          </div>
+          <nav class="switcher" aria-label="Account options">
+            <a href="{{ url_for('main.login') }}" class="{% if mode == 'login' %}active{% endif %}" {% if mode == "login" %}aria-current="page"{% endif %}>Log in</a>
+            <a href="{{ url_for('main.register') }}" class="{% if mode == 'register' %}active{% endif %}" {% if mode == "register" %}aria-current="page"{% endif %}>Register</a>
+          </nav>
+
+          {% if error %}<p class="message error" role="alert">{{ error }}</p>{% endif %}
+          {% if registered %}<p class="message success" role="status">Your account is ready. Log in to continue.</p>{% endif %}
+
+          <form class="auth-form" method="post" action="{{ url_for('main.create_account') if mode == 'register' else url_for('main.authenticate') }}">
+            {% if mode == "register" %}
+              <div class="field">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" placeholder="Choose a username" maxlength="80" autocomplete="username" required>
+              </div>
+            {% endif %}
+            <div class="field">
+              <label for="email">Email address</label>
+              <input id="email" name="email" type="email" placeholder="you@example.com" maxlength="254" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="{% if mode == 'register' %}At least 8 characters{% else %}Enter your password{% endif %}" minlength="8" maxlength="128" autocomplete="{% if mode == 'register' %}new-password{% else %}current-password{% endif %}" required>
+            </div>
+            {% if mode == "register" %}
+              <div class="field">
+                <label for="confirm_password">Confirm password</label>
+                <input id="confirm_password" name="confirm_password" type="password" placeholder="Enter your password again" minlength="8" maxlength="128" autocomplete="new-password" required>
+              </div>
+            {% endif %}
+            <button class="submit-button" type="submit">{% if mode == "register" %}Create account{% else %}Log in{% endif %}</button>
+          </form>
+          <p class="form-note">Your account details are stored securely.</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
