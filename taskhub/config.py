@@ -7,6 +7,6 @@ load_dotenv()
 
 class Config:
     DEBUG = os.getenv("DEBUG", "false").strip().lower() in {"1", "true", "yes", "on"}
-    SECRET_KEY = os.getenv("SECRET_KEY")
+    SECRET_KEY = os.getenv("SECRET_KEY") or os.urandom(32)
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///taskhub.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False

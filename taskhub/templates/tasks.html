@@ -1,23 +1,92 @@
-{% extends "base.html" %}
-{% block title %}{{ user.username }} · Taskhub{% endblock %}
-{% block content %}
-  <h1>{{ user.username }}'s tasks</h1>
-  <form method="post" action="{{ url_for('main.create_task', user_id=user.id) }}">
-    <label for="title">Title</label>
-    <input id="title" name="title" maxlength="200" required>
-    <label for="content">Content</label>
-    <textarea id="content" name="content" required></textarea>
-    <button type="submit">Create task</button>
-  </form>
 
-  <h2>Tasks</h2>
+
+
+
+
+
+
+{% extends "base.html" %}
+{% block title %}My tasks · Taskhub{% endblock %}
+{% block content %}
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Your workspace</p>
+      <h1>My tasks</h1>
+      <p class="page-subtitle">Keep track of the details, deadlines, and priorities.</p>
+    </div>
+    <button class="primary-button" type="button" data-open-task-dialog>＋ <span>Create new task</span></button>
+  </header>
+
+  {% if error %}<p class="message" role="alert">{{ error }}</p>{% endif %}
   {% if tasks %}
-    <ul>
+    <div class="task-list">
       {% for task in tasks %}
-        <li><a href="{{ url_for('main.get_task', task_id=task.id) }}">{{ task.title }}</a></li>
+        <a class="task-card" href="{{ url_for('main.get_task', task_id=task.id) }}">
+          <div style="min-width: 0">
+            <p class="task-title">{{ task.title }}</p>
+            <p class="task-deadline">{% if task.due_date %}Due {{ task.due_date.strftime("%b %d, %Y") }}{% else %}No deadline{% endif %}</p>
+          </div>
+          <span class="priority priority-{{ task.priority }}">{{ task.priority }}</span>
+        </a>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p class="muted">No tasks yet.</p>
+    <div class="panel empty-state">
+      <div class="empty-mark" aria-hidden="true">✓</div>
+      <h2>Your task list is ready</h2>
+      <p>Add your first task, then come back here to see its deadline and priority.</p>
+      <button class="primary-button" type="button" data-open-task-dialog>Create your first task</button>
+    </div>
   {% endif %}
+
+  <dialog id="task-dialog" aria-labelledby="task-dialog-title">
+    <div class="dialog-inner">
+      <div class="dialog-heading">
+        <div>
+          <h2 id="task-dialog-title">Create a new task</h2>
+          <p>Capture the task and decide when it needs to be done.</p>
+        </div>
+        <button class="close-button" type="button" aria-label="Close dialog" data-close-task-dialog>×</button>
+      </div>
+      <form class="task-form" method="post" action="{{ url_for('main.create_task', user_id=user.id) }}">
+        <div class="field">
+          <label for="title">Task title</label>
+          <input id="title" name="title" maxlength="200" placeholder="What needs to get done?" required>
+        </div>
+        <div class="field">
+          <label for="content">Details</label>
+          <textarea id="content" name="content" placeholder="Add a few details about this task" required></textarea>
+        </div>
+        <div class="field">
+          <label for="due_date">Deadline</label>
+          <input id="due_date" name="due_date" type="date" required>
+        </div>
+        <div class="field">
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority" required>
+            <option value="low">Low</option>
+            <option value="middle" selected>Middle</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close-task-dialog>Cancel</button>
+          <button class="primary-button" type="submit">Create task</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+  <script>
+    (() => {
+      const dialog = document.getElementById("task-dialog");
+      if (!(dialog instanceof HTMLDialogElement)) return;
+      document.querySelectorAll("[data-open-task-dialog]").forEach((button) => {
+        button.addEventListener("click", () => dialog.showModal());
+      });
+      document.querySelectorAll("[data-close-task-dialog]").forEach((button) => {
+        button.addEventListener("click", () => dialog.close());
+      });
+      {% if show_create_modal %}dialog.showModal();{% endif %}
+    })();
+  </script>
 {% endblock %}
