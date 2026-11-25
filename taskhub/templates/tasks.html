@@ -1,10 +1,6 @@
 
 
 
-
-
-
-
 {% extends "base.html" %}
 {% block title %}My tasks · Taskhub{% endblock %}
 {% block content %}
@@ -39,7 +35,7 @@
     </div>
   {% endif %}
 
-  <dialog id="task-dialog" aria-labelledby="task-dialog-title">
+  <dialog id="task-dialog" aria-labelledby="task-dialog-title" data-auto-open="{{ 'true' if show_create_modal else 'false' }}">
     <div class="dialog-inner">
       <div class="dialog-heading">
         <div>
@@ -86,7 +82,7 @@
       document.querySelectorAll("[data-close-task-dialog]").forEach((button) => {
         button.addEventListener("click", () => dialog.close());
       });
-      {% if show_create_modal %}dialog.showModal();{% endif %}
+      if (dialog.dataset.autoOpen === "true") dialog.showModal();
     })();
   </script>
 {% endblock %}
